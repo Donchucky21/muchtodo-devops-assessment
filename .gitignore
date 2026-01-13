@@ -36,3 +36,31 @@ docker-compose.test.yaml
 mongodb.key
 mongo-keyfile
 
+
+# =====================
+# DevOps / Containers
+# =====================
+
+# Environment files
+.env
+.env.*
+**/.env
+**/.env.*
+
+# Docker / Kubernetes artifacts
+evidence/
+kubernetes/.kubeconfig
+
+# Go build output
+bin/
+dist/
+build/
+*.out
+
+# Logs
+*.log
+
+# OS / editor
+.DS_Store
+.idea/
+.vscode/

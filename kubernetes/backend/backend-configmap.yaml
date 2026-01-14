@@ -1,0 +1,11 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: backend-configmap
+  namespace: muchtodo
+data:
+  PORT: "8080"
+  DB_NAME: "much_todo_db"
+  # Mongo service DNS inside cluster:
+  MONGO_URI: "mongodb://root:rootpassword@mongodb:27017/muchtodo?authSource=admin"
+  ENABLE_CACHE: "false"

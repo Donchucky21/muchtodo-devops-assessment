@@ -1,36 +1,44 @@
-# ---- Build stage ----
-FROM golang:1.25-alpine AS builder
+# syntax=docker/dockerfile:1
+
+########## Build stage ##########
+FROM golang:1.22-alpine AS builder
 
 WORKDIR /src
 
-RUN apk add --no-cache ca-certificates git
+# Install build deps (git sometimes needed for go modules)
+RUN apk add --no-cache git ca-certificates
 
-# Copy go mod files first for better caching
-COPY Server/MuchToDo/go.mod Server/MuchToDo/go.sum ./
+# Copy go.mod/go.sum first for caching
+COPY Server/MuchToDo/go.mod Server/MuchToDo/go.sum ./Server/MuchToDo/
+WORKDIR /src/Server/MuchToDo
 RUN go mod download
 
-# Copy the rest of the backend source
-COPY Server/MuchToDo/ ./
+# Copy source
+COPY Server/MuchToDo ./Server/MuchToDo
 
-# Build (adjust ./ if your main package is in a subfolder like ./cmd/api)
+# Build a static binary
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 \
-    go build -trimpath -ldflags="-s -w" -o /out/muchtodo ./cmd/api
+    go build -trimpath -ldflags="-s -w" -o /out/api ./cmd/api
 
-# ---- Runtime stage ----
+
+########## Runtime stage ##########
 FROM alpine:3.20
 
-RUN addgroup -S app && adduser -S app -G app
+# Create non-root user
+RUN addgroup -S app && adduser -S -G app app \
+    && apk add --no-cache ca-certificates curl
+
 WORKDIR /app
 
-RUN apk add --no-cache ca-certificates curl
+COPY --from=builder /out/api /app/api
 
-COPY --from=builder /out/muchtodo /app/muchtodo
-
+# Run as non-root
 USER app
 
-EXPOSE 3000
+EXPOSE 8080
 
-HEALTHCHECK --interval=10s --timeout=3s --start-period=10s --retries=5 \
-  CMD curl -fsS http://127.0.0.1:3000/health || exit 1
+# Healthcheck required by assessment
+HEALTHCHECK --interval=10s --timeout=3s --retries=5 \
+  CMD curl -fsS http://localhost:8080/health || exit 1
 
-ENTRYPOINT ["/app/muchtodo"]
+CMD ["/app/api"]

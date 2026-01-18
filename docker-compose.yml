@@ -1,0 +1,37 @@
+services:
+  mongodb:
+    image: mongo:4.4.30
+    container_name: muchtodo-mongo
+    restart: unless-stopped
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+      MONGO_INITDB_DATABASE: much_todo_db
+    volumes:
+      - mongo_data:/data/db
+    healthcheck:
+      test: ["CMD","mongo","--quiet","--eval","db.adminCommand('ping')"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  backend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: muchtodo-backend
+    depends_on:
+      mongodb:
+        condition: service_healthy
+    environment:
+      PORT: "8080"
+      DB_NAME: much_todo_db
+      MONGO_URI: mongodb://root:example@mongodb:27017/much_todo_db?authSource=admin
+      LOG_LEVEL: "DEBUG"
+      LOG_FORMAT: "json"
+    ports:
+      - "8080:8080"
+    restart: always
+
+volumes:
+  mongo_data:

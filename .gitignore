@@ -64,3 +64,15 @@ build/
 .DS_Store
 .idea/
 .vscode/
+
+# Accidental docker build artifacts
+CACHED
+[builder
+[internal]
+[stage-1
+exporting
+naming
+resolve
+transferring
+unpacking
+=

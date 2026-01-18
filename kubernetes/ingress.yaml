@@ -4,4 +4,14 @@ metadata:
   name: backend-ingress
   namespace: muchtodo
 spec:
-  rules: []
+  rules:
+    - host: muchtodo.local
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 8080

@@ -5,6 +5,16 @@ A robust RESTful API for a ToDo application built with Go (Golang). This project
 The API is built with a clean, layered architecture to separate concerns, making it scalable and easy to maintain. It includes a full suite of unit and integration tests and provides interactive API documentation via Swagger.
 
 ## Features
+## DevOps Deployment Overview
+
+This repository includes a complete containerization and Kubernetes deployment setup for the MuchToDo API, implemented as part of a DevOps assessment.
+
+The project supports:
+- Local development using Docker and Docker Compose
+- Local Kubernetes deployment using Kind (Kubernetes in Docker)
+- MongoDB persistence via volumes (Docker) and PVCs (Kubernetes)
+- Health checks and service exposure via NodePort
+
 
 * **User Management**: Secure user registration, login, update, and deletion.
 * **Authentication**: JWT-based authentication that supports both `httpOnly` cookies (for web clients) and `Authorization` headers.

@@ -1,3 +1,6 @@
 #!/usr/bin/env bash
 set -euo pipefail
-docker build -t muchtodo-backend:latest ./Server/MuchToDo
+
+# Build backend image from repo root Dockerfile
+docker build -t container-assessment-backend:latest .
+echo "✅ Docker image built: container-assessment-backend:latest"

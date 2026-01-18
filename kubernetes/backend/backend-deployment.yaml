@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
         - name: backend
-          image: muchtodo-backend:latest
+          image: container-assessment-backend:latest
           imagePullPolicy: IfNotPresent
           ports:
             - containerPort: 8080

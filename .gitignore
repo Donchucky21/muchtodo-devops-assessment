@@ -48,7 +48,6 @@ mongo-keyfile
 **/.env.*
 
 # Docker / Kubernetes artifacts
-evidence/
 kubernetes/.kubeconfig
 
 # Go build output

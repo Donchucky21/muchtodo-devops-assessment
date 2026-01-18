@@ -20,25 +20,44 @@ type Config struct {
 
 // LoadConfig reads configuration from file or environment variables.
 func LoadConfig(path string) (config Config, err error) {
+	viper.Reset()
+
+	// Defaults
+	viper.SetDefault("PORT", "8080")
+	viper.SetDefault("ENABLE_CACHE", false)
+	viper.SetDefault("JWT_EXPIRATION_HOURS", 72)
+	viper.SetDefault("LOG_LEVEL", "DEBUG")
+	viper.SetDefault("LOG_FORMAT", "json")
+
+	// Read .env if it exists (local dev). In containers, env vars are used.
 	viper.AddConfigPath(path)
 	viper.SetConfigName(".env")
 	viper.SetConfigType("env")
 
+	// Environment variables should always work (Docker/K8s)
 	viper.AutomaticEnv()
 
-	// Set default values
-	viper.SetDefault("PORT", "8080")
-	viper.SetDefault("ENABLE_CACHE", false)
-	viper.SetDefault("JWT_EXPIRATION_HOURS", 72)
+	// Explicitly bind env vars (removes any mapping ambiguity)
+	_ = viper.BindEnv("PORT")
+	_ = viper.BindEnv("MONGO_URI")
+	_ = viper.BindEnv("DB_NAME")
+	_ = viper.BindEnv("JWT_SECRET_KEY")
+	_ = viper.BindEnv("JWT_EXPIRATION_HOURS")
+	_ = viper.BindEnv("ENABLE_CACHE")
+	_ = viper.BindEnv("REDIS_ADDR")
+	_ = viper.BindEnv("REDIS_PASSWORD")
+	_ = viper.BindEnv("LOG_LEVEL")
+	_ = viper.BindEnv("LOG_FORMAT")
 
-	err = viper.ReadInConfig()
-	if err != nil {
-		if _, ok := err.(viper.ConfigFileNotFoundError); !ok {
-			return
+	// Try to read .env, but ignore if missing
+	if readErr := viper.ReadInConfig(); readErr != nil {
+		if _, ok := readErr.(viper.ConfigFileNotFoundError); !ok {
+			return config, readErr
 		}
 	}
 
 	err = viper.Unmarshal(&config)
 	return
 }
+
 
